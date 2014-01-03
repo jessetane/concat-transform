@@ -1,10 +1,10 @@
 # concat-transform
 transform stream that defers executing `_transform` until end
 
-# why
+## why
 you have a transformation that can only be performed atomically
 
-# how
+## how
 subclass of `stream.Transform` that buffers into memory
 
 ## tests
