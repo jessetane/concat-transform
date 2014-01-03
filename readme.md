@@ -10,7 +10,7 @@ you have a transformation that can only be performed atomically
 subclass of `stream.Transform` that buffers into memory
 
 ## tests
-node: `node test`
+node: `node test`  
 browser: `require('concat-transform/test')`
 
 ## license
