@@ -1,19 +1,24 @@
 var tape = require('tape');
 var crypto = require('crypto');
-var chunky = require('chunky');
 var stream = require('stream');
 var ConcatTransform = require('./');
+var makeChunks = require('chunky');
 
 tape('strings', function(t) {
+  var actual, expected = 'Humpty Dumpty was a big fat egg / He was playing the wall and then he broke his leg';
+  var wcnt = { i: 0 };
+  var tcnt = 0;
+  var chunks = chunky(expected);
+  
   var input = new stream.PassThrough;
+  var tr = new ConcatTransform;
   var output = new stream.PassThrough;
   
-  var tr = new ConcatTransform;
   tr._transform = function(c, enc, cb) {
     var self = this;
     setTimeout(function() {
-      transformCount++;
-      cb(null, c.toString().toUpperCase());
+      tcnt++;
+      cb(null, c);
     }, 20);
   };
   
@@ -22,42 +27,29 @@ tape('strings', function(t) {
   });
   
   output.on('end', function() {
-    t.equal(writeCount > 1, true);
-    t.equal(transformCount, 1);
+    t.equal(wcnt.i > 1, true);
+    t.equal(tcnt, 1);
     t.equal(actual, expected);
     t.end();
   });
   
   input.pipe(tr).pipe(output);
-  
-  var fixture = 'Humpty Dumpty was a big fat egg / He was playing the wall and then he broke his leg';
-  var expected = fixture.toUpperCase();
-  var actual;
-  var transformCount = 0;
-  var writeCount = 0;
-  var delay = 0;
-  var chunks = chunky(fixture);
-  
-  for (var i=0; i<chunks.length; i++) (function(chunk) {
-    var last = i === chunks.length - 1;
-    delay += 1 + 10 * Math.random();
-    setTimeout(function() {
-      var action = last ? 'end' : 'write';
-      writeCount++;
-      input[action](chunk);
-    }, delay);
-  })(chunks[i]);
+  feedChunks(input, chunky(expected), wcnt);
 });
 
 tape('binary', function(t) {
+  var actual, expected = crypto.randomBytes(50);
+  var wcnt = { i: 0 };
+  var tcnt = 0;
+  
   var input = new stream.PassThrough;
+  var tr = new ConcatTransform;
   var output = new stream.PassThrough;
   
-  var tr = new ConcatTransform;
   tr._transform = function(c, enc, cb) {
     var self = this;
     setTimeout(function() {
-      transformCount++;
+      tcnt++;
       cb(null, c);
     }, 20);
   };
@@ -67,42 +59,30 @@ tape('binary', function(t) {
   });
   
   output.on('end', function() {
-    t.equal(writeCount > 1, true);
-    t.equal(transformCount, 1);
-    t.equal(JSON.stringify(expected),
-            JSON.stringify(actual));
+    t.equal(wcnt.i > 1, true);
+    t.equal(tcnt, 1);
+    t.equal(actual.toString('base64'),
+            expected.toString('base64'));
     t.end();
   });
   
   input.pipe(tr).pipe(output);
-  
-  var expected = crypto.randomBytes(50);
-  var actual;
-  var writeCount = 0;
-  var transformCount = 0;
-  var delay = 0;
-  var chunks = chunky(expected);
-  
-  for (var i=0; i<chunks.length; i++) (function(chunk) {
-    var last = i === chunks.length - 1;
-    delay += 1 + 10 * Math.random();
-    setTimeout(function() {
-      var action = last ? 'end' : 'write';
-      writeCount++;
-      input[action](chunk);
-    }, delay);
-  })(chunks[i]);
+  feedChunks(input, chunky(expected), wcnt);
 });
 
 tape('objectMode', function(t) {
+  var actual, expected = [ 'a', 2, { x: 3 }, true, 5 ];
+  var wcnt = { i: 0 };
+  var tcnt = 0;
+  
   var input = new stream.PassThrough({ objectMode: true });
+  var tr = new ConcatTransform({ objectMode: true });
   var output = new stream.PassThrough({ objectMode: true });
   
-  var tr = new ConcatTransform({ objectMode: true });
   tr._transform = function(c, enc, cb) {
     var self = this;
     setTimeout(function() {
-      transformCount++;
+      tcnt++;
       cb(null, c);
     }, 20);
   };
@@ -112,28 +92,33 @@ tape('objectMode', function(t) {
   });
   
   output.on('end', function() {
-    t.equal(writeCount > 1, true);
-    t.equal(transformCount, 1);
+    t.equal(wcnt.i > 1, true);
+    t.equal(tcnt, 1);
     t.equal(JSON.stringify(expected),
             JSON.stringify(actual));
     t.end();
   });
   
   input.pipe(tr).pipe(output);
-  
-  var expected = [ 'a', 2, { x: 3 }, true, 5 ];
-  var actual;
-  var writeCount = 0;
-  var transformCount = 0;
+  feedChunks(input, expected, wcnt);
+});
+
+function feedChunks(input, chunks, cnt) {
   var delay = 0;
-  
-  for (var i=0; i<expected.length; i++) (function(chunk) {
-    var last = i === expected.length - 1;
+  for(var i=0; i<chunks.length; i++) (function(chunk) {
     delay += 1 + 10 * Math.random();
     setTimeout(function() {
-      var action = last ? 'end' : 'write';
-      writeCount++;
+      cnt.i++;
+      var action = chunk === chunks.slice(-1)[0] ? 'end' : 'write';
       input[action](chunk);
     }, delay);
-  })(expected[i]);
-});
+  })(chunks[i]);
+}
+
+function chunky(data) {
+  var c;
+  while (!c || c.length <= 1) {
+    c = makeChunks(data);
+  }
+  return c;
+}
