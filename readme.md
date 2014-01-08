@@ -4,7 +4,7 @@ transform stream that defers executing `_transform` until end
 [![Browser Support](http://ci.testling.com/jessetane/concat-transform.png)](http://ci.testling.com/jessetane/concat-transform)
 
 ## why
-you have a transformation that can only be performed atomically
+useful if you have a transformation that can only be performed atomically - this was factored out of an attempt to fake streams for [zlib-browserify](github.com/brianloveswords/zlib-browserify)
 
 ## how
 subclass of `stream.Transform` that buffers into memory
