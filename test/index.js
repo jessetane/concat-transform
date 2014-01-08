@@ -1,7 +1,7 @@
 var tape = require('tape');
 var crypto = require('crypto');
 var stream = require('stream');
-var ConcatTransform = require('./');
+var ConcatTransform = require('../');
 var makeChunks = require('chunky');
 
 tape('strings', function(t) {

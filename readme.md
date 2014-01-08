@@ -10,8 +10,8 @@ useful if you have a transformation that can only be performed atomically - this
 subclass of `stream.Transform` that buffers into memory
 
 ## tests
-node: `node test`  
-browser: `require('concat-transform/test')`
+* in node: `node test`
+* in browser: `npm run browser` (get browserify and bash first)
 
 ## license
 WTFPL

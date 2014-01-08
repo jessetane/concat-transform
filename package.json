@@ -17,7 +17,8 @@
     "chunky": "~0.0.0"
   },
   "scripts": {
-    "test": "node test"
+    "test": "node test",
+    "browser": "browserify test/index.js > test/bundle.js && { [ -x \"$(which open)\" ] && open test/index.html || xdg-open test/index.html; }"
   },
   "testling" : {
     "files" : "test.js",
