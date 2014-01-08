@@ -1,6 +1,6 @@
 {
   "name": "concat-transform",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "transform stream that defers executing `_transform` until end",
   "keywords": [
     "concat",
