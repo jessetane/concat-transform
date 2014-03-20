@@ -1,6 +1,6 @@
 {
   "name": "concat-transform",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "transform stream that defers executing `_transform` until end",
   "keywords": [
     "concat",
@@ -9,6 +9,10 @@
     "transform",
     "stream"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/jessetane/concat-transform.git"
+  },
   "dependencies": {
     "inherits": "~2.0.1"
   },
@@ -23,11 +27,11 @@
   "testling" : {
     "files" : "test/index.js",
     "browsers" : [
-      "ie/8", "ie/9", "ie/10", "ie/11",
-      "chrome/15", "chrome/latest",
-      "firefox/10", "firefox/latest",
-      "safari/latest",
-      "opera/latest"
+      "ie/8..latest",
+      "ff/24..latest",
+      "chrome/25..latest",
+      "safari/5.1..latest",
+      "opera/12..latest"
     ]
   },
   "author": "jesse.tane@gmail.com",
